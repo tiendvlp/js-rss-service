@@ -1,6 +1,7 @@
 const API_KEY = "crqz0qfs3k4uuqh1ywrh1bk5v6ojrhrclgggesov"
 const API_URL = "https://api.rss2json.com/v1/api.json?rss_url="
 import fetch from 'node-fetch';
+
 export const Parser = {}
 Parser.parse = async function parse(rssUrl) {
     const requestUrl = API_URL + rssUrl + "&api_key=" + API_KEY

@@ -1,18 +1,16 @@
 import {Parser as parser} from './rss-parser.js'
-import { Firebase } from '../firebase-instance.js'
-const firebase = new Firebase()
-const fireStore = firebase.fireStore
+import { fireBase } from '../firebase-instance.js'
+const fireStore = fireBase.fireStore
 import {encrypt} from '../UrlEncrypt.js'
 import fetch from 'node-fetch';
 
-
+export default {
+    reload
+}
 
 async function reload(rssUrl, channelId) {
     const parseResult = await parser.parse(rssUrl)
-    console.log(parseResult.data)
     if (parseResult.isSuccess) {
-        const snapshot = await fireStore.collection('RssChannels').get()
-        console.log(JSON.stringify(snapShot))
         saveFeedsToFireStore(channelId,parseResult.data)
     }
 }
@@ -20,7 +18,6 @@ async function reload(rssUrl, channelId) {
 async function saveFeedsToFireStore (rssChannelId, rssObject) {
     let feed = rssObject.feed
     await Promise.all(rssObject.items.map(async (item) => {
-        console.log("hello: " + item)
         let id = encrypt(item.link)
         let imageUrl = item.thumbnail
         // null or blank
@@ -40,6 +37,7 @@ async function saveFeedsToFireStore (rssChannelId, rssObject) {
             pubDate: getPubDate(item.pubDate),
             rssChannelId: rssChannelId,
             title: item.title,
+            latestUpdate: Date.now(),
             url: item.link
         }
         await docRef.set(newDoc)

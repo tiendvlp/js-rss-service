@@ -1,10 +1,11 @@
-var createError = require('http-errors');
-var express = require('express');
-var logger = require('morgan');
+import createError from 'http-errors';
+import express from 'express';
+import logger from 'morgan';
 
-var indexRouter = require('./routes/index');
-
-var app = express();
+import {router as indexRouter} from './routes/index.js';
+import channelTrackingService from './tracking-service/tracking-service.js'
+import channelChangeSendNotifService from './notification-service/send-channel-notification-async-service.js'
+export const app = express();
 
 // view engine setup
 app.use(logger('dev'));
@@ -30,6 +31,6 @@ app.use(function(err, req, res, next) {
 });
 app.listen(3000, () => {
     console.log("ready")
-
+    channelTrackingService.start()
+    channelChangeSendNotifService.start()
 })
-module.exports = app;

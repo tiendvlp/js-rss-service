@@ -5,7 +5,7 @@ import {encrypt} from '../UrlEncrypt.js'
 import fetch from 'node-fetch';
 import channelReloadSerivce from './channel-reload-async-service.js'
 
-const ONE_HOUR = 1000 * 60 * 60
+const THIRTY_MINUTES = 1000 * 60 * 30
 const TWO_MINUTES = 1000 * 60 * 2
 
 let isStop = false
@@ -17,7 +17,7 @@ async function stopTrackingService () {
 async function startTrackingService () {
     isStop = false;
     let startTime = Date.now()
-    let snapShot = await fireStore.collection("RssChannels").where('latestUpdate', '<=', Date.now() - 10*1000).orderBy("latestUpdate").limit(15).get()
+    let snapShot = await fireStore.collection("RssChannels").where('latestUpdate', '<=', Date.now() - THIRTY_MINUTES).orderBy("latestUpdate").limit(20).get()
     await Promise.all(snapShot.docs.map(async (doc) => {
         let data = doc.data()
         // to prevent overlay update, we need to update the latestUpdate field first

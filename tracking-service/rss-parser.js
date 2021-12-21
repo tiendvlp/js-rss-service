@@ -4,14 +4,21 @@ import fetch from 'node-fetch';
 
 export const Parser = {}
 Parser.parse = async function parse(rssUrl) {
-    const requestUrl = API_URL + rssUrl + "&api_key=" + API_KEY
-    console.log(requestUrl)
-    const resp = await fetch(requestUrl)
-    const respData = await resp.json().then(data => ({ status: resp.status, body: data, statusText: resp.statusText }))
-    if (respData.status == 200) {
-        return { isSuccess: true, data: respData.body }
-    } else {
-        console.log("Parse rss feed failed: " + respData.body.message)
-        return { isSuccess: false, message: respData.body.message }
+    try {
+        const requestUrl = API_URL + rssUrl + "&api_key=" + API_KEY
+        console.log(requestUrl)
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 7000)
+        let resp = await fetch(requestUrl, { signal: controller.signal })
+        clearTimeout(timeoutId)
+        if (!resp.ok) {
+            console.log("Parse rss feed " + rssUrl + "failed: " + resp.statusText)
+            return { isSuccess: false, message: resp.statusText }
+        }
+        const respData = await resp.json().then(data => ({ status: resp.status, body: data, statusText: resp.statusText }))
+        console.log("RssParser: fetch rss data" + rssUrl + " succesfully")
+        return { isSuccess: true, data: respData.body, message: resp.statusText }
+    } catch (ex) {
+        return { isSuccess: false, message: "Connection timeout" }
     }
 }

@@ -8,14 +8,14 @@ export default {
     reload
 }
 
-async function reload(rssUrl, channelId) {
+async function reload(rssUrl, channelTitle, channelId) {
     const parseResult = await parser.parse(rssUrl)
     if (parseResult.isSuccess) {
-        saveFeedsToFireStore(channelId, parseResult.data)
+        saveFeedsToFireStore(channelId, channelTitle, parseResult.data)
     }
 }
 
-async function saveFeedsToFireStore(rssChannelId, rssObject) {
+async function saveFeedsToFireStore(rssChannelId, channelTitle, rssObject) {
     let feed = rssObject.feed
     await Promise.all(rssObject.items.map(async(item) => {
         let id = encrypt(item.link)
@@ -29,7 +29,7 @@ async function saveFeedsToFireStore(rssChannelId, rssObject) {
         let docRef = fireStore.collection("Feeds").doc(id)
         let newDoc = {
             author: item.author,
-            channelTitle: item.title,
+            channelTitle: channelTitle,
             content: item.content,
             description: item.description,
             id: id,

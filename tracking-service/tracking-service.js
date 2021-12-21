@@ -9,17 +9,30 @@ const THIRTY_MINUTES = 1000 * 60 * 30
 const TWO_MINUTES = 1000 * 60 * 2
 
 let isStop = false
-
+    // async function abc() {
+    //     let snapShot = await fireStore.collection("Feeds").get()
+    //     snapShot.forEach(async(doc) => {
+    //         console.log("Updating " + doc.data().title)
+    //         let data = doc.data()
+    //         let channelDoc = await fireStore.collection("RssChannels").doc(data.rssChannelId).get()
+    //         let channel = channelDoc.data()
+    //         data.channelTitle = channel.title
+    //         await fireStore.collection("Feeds").doc(data.id).set(data)
+    //     })
+    // }
 async function stopTrackingService() {
     isStop = true;
 }
 
 async function startTrackingService() {
     isStop = false;
+    // await abc()
     let startTime = Date.now()
     let snapShot = await fireStore.collection("RssChannels")
         // .where('latestUpdate', '<=', Date.now() - THIRTY_MINUTES)
-        .orderBy("latestUpdate").limit(20).get()
+        .orderBy("latestUpdate")
+        // .limit(20)
+        .get()
     await Promise.all(snapShot.docs.map(async(doc) => {
         let data = doc.data()
             // to prevent overlay update, we need to update the latestUpdate field first
@@ -31,7 +44,7 @@ async function startTrackingService() {
         let data = doc.data()
             // let's update
         console.log("Let update ", data.title, " - ", data.rssUrl)
-        await channelReloadSerivce.reload(data.rssUrl, data.id)
+        await channelReloadSerivce.reload(data.rssUrl, data.title, data.id)
     }))
     let endTime = Date.now()
     let processTime = endTime - startTime

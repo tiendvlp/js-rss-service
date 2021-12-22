@@ -7,31 +7,25 @@ import channelReloadSerivce from './channel-reload-async-service.js'
 
 const THIRTY_MINUTES = 1000 * 60 * 30
 const TWO_MINUTES = 1000 * 60 * 2
+const THREE_MINUTES = 1000 * 60 * 3
 
 let isStop = false
-    // async function abc() {
-    //     let snapShot = await fireStore.collection("Feeds").get()
-    //     snapShot.forEach(async(doc) => {
-    //         console.log("Updating " + doc.data().title)
-    //         let data = doc.data()
-    //         let channelDoc = await fireStore.collection("RssChannels").doc(data.rssChannelId).get()
-    //         let channel = channelDoc.data()
-    //         data.channelTitle = channel.title
-    //         await fireStore.collection("Feeds").doc(data.id).set(data)
-    //     })
-    // }
+
+let strDate = "2021-12-22 02:00:00 UTC+0000 (+00)"
+
+console.log("" + Date.parse(strDate))
+
 async function stopTrackingService() {
     isStop = true;
 }
 
 async function startTrackingService() {
     isStop = false;
-    // await abc()
     let startTime = Date.now()
     let snapShot = await fireStore.collection("RssChannels")
-        // .where('latestUpdate', '<=', Date.now() - THIRTY_MINUTES)
+        .where('latestUpdate', '<=', Date.now() - THIRTY_MINUTES)
         .orderBy("latestUpdate")
-        // .limit(20)
+        .limit(20)
         .get()
     await Promise.all(snapShot.docs.map(async(doc) => {
         let data = doc.data()
@@ -46,10 +40,11 @@ async function startTrackingService() {
         console.log("Let update ", data.title, " - ", data.rssUrl)
         await channelReloadSerivce.reload(data.rssUrl, data.title, data.id)
     }))
+
     let endTime = Date.now()
     let processTime = endTime - startTime
     console.log("2 minutes to the next update")
-    await sleep(TWO_MINUTES)
+    await sleep(THREE_MINUTES)
     if (!isStop) {
         await startTrackingService()
     } else {

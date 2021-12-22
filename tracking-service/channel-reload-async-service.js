@@ -45,8 +45,7 @@ async function saveFeedsToFireStore(rssChannelId, channelTitle, rssObject) {
 }
 
 function getPubDate(date) {
-    console.log(Date.parse(date))
-    return Date.parse(date)
+    return Date.parse(date + " UTC+0000 (+00)")
 }
 
 async function getFirstImageUrl(feedUrl) {
@@ -62,11 +61,22 @@ async function getFirstImageUrl(feedUrl) {
         let content = respData.body
             // remove all white space
         let searchTarget = content.replace(/ /g, '')
-        let headerTagIndex = searchTarget.indexOf("</header>")
-        let imageTagIndex = searchTarget.indexOf("<img", headerTagIndex)
-        if (imageTagIndex == -1) {
-            return null
+        let startIndex = searchTarget.indexOf("<article")
+        let imageTagIndex = -1
+        if (startIndex != -1) {
+            imageTagIndex = searchTarget.indexOf("<img", startIndex)
         }
+        if (imageTagIndex == -1) {
+            startIndex = searchTarget.indexOf("</header>")
+            if (startIndex == -1) {
+                return null;
+            }
+            imageTagIndex = searchTarget.indexOf("<img", startIndex)
+            if (imageTagIndex == -1) {
+                return null
+            }
+        }
+
         let srcPropIndex = searchTarget.indexOf("src", imageTagIndex)
 
         if (srcPropIndex == -1) {

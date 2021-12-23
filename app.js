@@ -2,7 +2,7 @@ import createError from 'http-errors';
 import express from 'express';
 import logger from 'morgan';
 
-import {router as indexRouter} from './routes/index.js';
+import { router as indexRouter } from './routes/index.js';
 import channelTrackingService from './tracking-service/tracking-service.js'
 import channelChangeSendNotifService from './notification-service/send-channel-notification-async-service.js'
 export const app = express();
@@ -29,7 +29,7 @@ app.use(function(err, req, res, next) {
         error: err
     });
 });
-app.listen(3000, () => {
+app.listen(80, () => {
     console.log("ready")
     channelTrackingService.start()
     channelChangeSendNotifService.start()

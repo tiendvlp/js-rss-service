@@ -5,15 +5,10 @@ import { encrypt } from '../UrlEncrypt.js'
 import fetch from 'node-fetch';
 import channelReloadSerivce from './channel-reload-async-service.js'
 
-const THIRTY_MINUTES = 1000 * 60 * 30
-const TWO_MINUTES = 1000 * 60 * 2
-const THREE_MINUTES = 1000 * 60 * 3
+const OUTDATED_RULE_DURATION = 1000 * 60 * 30
+const SLEEP_DURATION = 1000 * 60 * 3
 
 let isStop = false
-
-let strDate = "2021-12-22 02:00:00 UTC+0000 (+00)"
-
-console.log("" + Date.parse(strDate))
 
 async function stopTrackingService() {
     isStop = true;
@@ -23,7 +18,7 @@ async function startTrackingService() {
     isStop = false;
     let startTime = Date.now()
     let snapShot = await fireStore.collection("RssChannels")
-        .where('latestUpdate', '<=', Date.now() - THIRTY_MINUTES)
+        .where('latestUpdate', '<=', Date.now() - OUTDATED_RULE_DURATION)
         .orderBy("latestUpdate")
         .limit(20)
         .get()
@@ -43,8 +38,8 @@ async function startTrackingService() {
 
     let endTime = Date.now()
     let processTime = endTime - startTime
-    console.log("2 minutes to the next update")
-    await sleep(THREE_MINUTES)
+    console.log(SLEEP_DURATION / (1000 * 60) + " minutes to the next update")
+    await sleep(SLEEP_DURATION)
     if (!isStop) {
         await startTrackingService()
     } else {

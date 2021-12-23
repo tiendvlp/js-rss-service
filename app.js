@@ -6,8 +6,8 @@ import { router as indexRouter } from './routes/index.js';
 import channelTrackingService from './tracking-service/tracking-service.js'
 import channelChangeSendNotifService from './notification-service/send-channel-notification-async-service.js'
 export const app = express();
-
-// view engine setup
+import dotenv from 'dotenv'
+dotenv.config();
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -29,8 +29,8 @@ app.use(function(err, req, res, next) {
         error: err
     });
 });
-app.listen(80, () => {
+app.listen(3000, () => {
     console.log("ready")
-    channelTrackingService.start()
+    channelTrackingService.start(process.env.OUTDATED_RULE_DURATION, process.env.SLEEP_BETWEEN_UPDATE)
     channelChangeSendNotifService.start()
 })

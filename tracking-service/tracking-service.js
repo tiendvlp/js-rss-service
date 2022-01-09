@@ -17,6 +17,7 @@ async function startTrackingService(outdatedDuration, sleepDuration) {
     console.log("Update every channel that is not updated in the last " + outdatedDuration / (1000 * 60) + " minutes")
     let snapShot = await fireStore.collection("RssChannels")
         .where('latestUpdate', '<=', Date.now() - outdatedDuration)
+        // .where("url", "==", "https://tinhte.vn/lists/trang-chu.1")
         .orderBy("latestUpdate")
         .limit(20)
         .get()

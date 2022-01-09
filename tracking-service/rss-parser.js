@@ -5,7 +5,8 @@ import fetch from 'node-fetch';
 export const Parser = {}
 Parser.parse = async function parse(rssUrl) {
     try {
-        const requestUrl = API_URL + rssUrl + "&api_key=" + API_KEY
+        const count = 1000
+        const requestUrl = API_URL + rssUrl + "&api_key=" + API_KEY + "&count=" + count
         console.log(requestUrl)
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 7000)
